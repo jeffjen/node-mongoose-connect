@@ -1,0 +1,14 @@
+{
+  "name": "node-mongoose-connect",
+  "version": "0.0.1",
+  "description": "Connection Helper for ODM mongoose",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jeffrey Jen <yihungjen@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "mongoose": "^4.4.11"
+  }
+}
