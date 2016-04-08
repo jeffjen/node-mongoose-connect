@@ -15,7 +15,10 @@ mongoose.Promise = require("promise");
 function Connection(mongo_uri) {
     mongo_uri = mongo_uri || "localhost";
     function _connect(ev, mongo_uri) {
-        var db = mongoose.createConnection(mongo_uri, {config: {autoIndex: false}});
+        var db = mongoose.createConnection(mongo_uri, {
+            config: { autoIndex: false },
+            server: { auto_reconnect: false },
+        });
         var _this = this;
         db.once("error", function(err) {
             ev.emit("mongoose::err", err);
@@ -24,6 +27,9 @@ function Connection(mongo_uri) {
         db.once("connected", function() {
             ev.reset();
             ev.emit("mongoose::conn", db);
+            db.once("disconnected", function(err) {
+                setTimeout(_connect, ev.fail(), ev, mongo_uri);
+            })
         });
     }
     this.backoff = 0;
