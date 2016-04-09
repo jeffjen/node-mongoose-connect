@@ -9,7 +9,7 @@ const EventEmitter = require('events');
 var mongoose = EXPORT.mongoose = require("mongoose");
 
 // Set mongoose to use Promise lib from promise
-mongoose.Promise = require("promise");
+mongoose.Promise = require("bluebird");
 
 // Connection management object
 function Connection(mongo_uri) {
