@@ -19,7 +19,6 @@ function Connection(mongo_uri) {
             config: { autoIndex: false },
             server: { auto_reconnect: false },
         });
-        var _this = this;
         db.once("error", function(err) {
             ev.emit("mongoose::err", err);
             setTimeout(_connect, ev.fail(), ev, mongo_uri);
@@ -28,11 +27,17 @@ function Connection(mongo_uri) {
             ev.reset();
             ev.emit("mongoose::conn", db);
             db.once("disconnected", function(err) {
-                setTimeout(_connect, ev.fail(), ev, mongo_uri);
-            })
+                // Check if we stopped explicitly, otherwise reconnect
+                if (!ev.stop) {
+                    setTimeout(_connect, ev.fail(), ev, mongo_uri);
+                }
+            });
         });
+        ev.database = db; // attach database connection object
     }
     this.backoff = 0;
+    this.stop = false;
+    this.database = undefined;
     _connect(this, mongo_uri);
 }
 util.inherits(Connection, EventEmitter);
@@ -45,6 +50,11 @@ Connection.prototype.fail = function fail() {
 Connection.prototype.reset = function reset() {
     this.backoff = 0;
     return true;
+}
+
+Connection.prototype.disconnect = function disconnect() {
+    this.database.close();
+    this.stop = true;
 }
 
 EXPORT.Connection = Connection;
